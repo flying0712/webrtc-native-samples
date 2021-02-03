@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="AppMotionEstimationVkCuda.cpp" />
+    <ClCompile Include="NvEnc.cpp" />
+    <ClCompile Include="utility.cpp" />
+    <ClCompile Include="..\..\NvCodec\NvEncoder\NvEncoder.cpp">
+      <Filter>NvCodec</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="NvEnc.h" />
+    <ClInclude Include="utility.h" />
+    <ClInclude Include="..\..\NvCodec\NvEncoder\NvEncoder.h">
+      <Filter>NvCodec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\nvEncodeAPI.h">
+      <Filter>NvCodec</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="NvCodec">
+      <UniqueIdentifier>{43e1ba14-6217-40ff-b812-f219f30f3652}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
