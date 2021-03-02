@@ -2,7 +2,7 @@
 
 GCC ?= g++
 
-CCFLAGS := -std=c++11
+CCFLAGS := -std=c++14  -DWEBRTC_LINUX -DWEBRTC_POSIX  -DWEBRTC_USE_H264 -D -fno-rtti -lpthread -ldl
 
 # Debug build flags
 ifeq ($(dbg),1)
@@ -40,6 +40,15 @@ LDFLAGS += -lnvcuvid -L$(CUDA_PATH)/lib64 -lcudart -lnvidia-encode
 # INCLUDES += $(shell pkg-config --cflags libavcodec libavutil libavformat)
 
 # INCLUDES += ${NVDIA_SDK_SAMPLES_PATH} ${NVDIA_SDK_SAMPLES_PATH}/NvCodec
+
+
+WEBRTC_PATH := ../../third_party/webrtc
+INCLUDES += -I${WEBRTC_PATH}/include
+INCLUDES += -I${WEBRTC_PATH}/include/third_party/abseil-cpp/
+INCLUDES += -I${WEBRTC_PATH}/include/third_party/libyuv/include
+
+
+
 # Target rules
 all: build
 
@@ -57,11 +66,22 @@ NvEncoderCuda.o: ${NVDIA_SDK_SAMPLES_PATH}/NvCodec/NvEncoder/NvEncoderCuda.cpp# 
 c_encoder_nv_impl.o: c_encoder_nv_impl.cpp
 	$(GCC) $(CCFLAGS) $(INCLUDES) -o $@ -c $<
 
+h264_encoder_adaptor.o: h264_encoder_adaptor.cpp
+	$(GCC) $(CCFLAGS) $(INCLUDES) -o $@ -c $<
+
+
+
 test_nv_encoder.o: test_nv_encoder.cpp 
 	$(GCC) $(CCFLAGS)  -o $@ -c $<
 
+
+
+
 test_nv_encoder: test_nv_encoder.o c_encoder_nv_impl.o NvEncoderCuda.o NvEncoder.o
 	$(GCC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
+
+
+
 
 clean:
 	rm -rf test_nv_encoder test_nv_encoder.o c_encoder_nv_impl.o NvEncoderCuda.o NvEncoder.o

@@ -7,6 +7,8 @@
 
 // 全流程：从本地存储了yuv像素的文件逐帧读取并编码，再将编码后h264文件保存到本地
 // 全流程全部调用接口CEncoder中接口
+struct CEonder nv_c_encoder = c_encoder;
+
 static int test_nvenc(void)
 {
 

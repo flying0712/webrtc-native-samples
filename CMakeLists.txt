@@ -4,8 +4,9 @@ project(demo VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-set(LIBWEBRTC_INCLUDE_PATH "/home/lei/code/prebuilt/m87.4280.10.0/include")
-set(LIBWEBRTC_BINARY_PATH "/home/lei/code/prebuilt/m87.4280.10.0/lib")
+set(LIBWEBRTC_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/third_party/webrtc/include)
+set(LIBWEBRTC_BINARY_PATH ${PROJECT_SOURCE_DIR}/third_party/webrtc/lib)
+set(WORK)
 
 
 set(

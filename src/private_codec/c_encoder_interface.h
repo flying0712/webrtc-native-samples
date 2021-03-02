@@ -30,14 +30,14 @@ struct CEncoder
     void (*destroy)(void **encoder_data);
     bool (*init)(void *encoder_data, void *encoder_config);
 
-    int (*set_bitrate)(void *nvenc_data, uint32_t bitrate_bps);
-    int (*set_framerate)(void *nvenc_data, uint32_t framerate);
-    int (*request_idr)(void *nvenc_data);
-    int (*get_framesize)(void *nvenc_data);
+    int (*set_bitrate)(void *encoder_data, uint32_t bitrate_bps);
+    int (*set_framerate)(void *encoder_data, uint32_t framerate);
+    int (*request_idr)(void *encoder_data);
+    int (*get_framesize)(void *encoder_data);
 
-    int (*encode)(void *nvenc_data, uint8_t *in_buf, uint8_t *out_buf, uint32_t max_buf_size);
+    int (*encode)(void *encoder_data, uint8_t *in_buf, uint8_t *out_buf, uint32_t max_buf_size);
 
-    int (*get_sequence_params)(void *nvenc_data, uint8_t *buf, uint32_t max_buf_size);
+    int (*get_sequence_params)(void *encoder_data, uint8_t *buf, uint32_t max_buf_size);
 
     bool (*test)(void);
 };
