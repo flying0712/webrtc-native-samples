@@ -2,7 +2,7 @@
 
 GCC ?= g++
 
-CCFLAGS := -std=c++14  -DWEBRTC_LINUX -DWEBRTC_POSIX  -DWEBRTC_USE_H264 -D -fno-rtti -lpthread -ldl
+CCFLAGS := -std=c++14  -DWEBRTC_LINUX -DWEBRTC_POSIX  -DWEBRTC_USE_H264 -fno-rtti -lpthread -ldl
 
 # Debug build flags
 ifeq ($(dbg),1)
@@ -23,12 +23,14 @@ NVCC ?= $(CUDA_PATH)/bin/nvcc
 
 # Common includes and paths
 INCLUDES := -I$(CUDA_PATH)/include
-INCLUDES += -I${NVDIA_SDK_SAMPLES_PATH}/NvCodec
-INCLUDES += -I${NVDIA_SDK_SAMPLES_PATH}/NvCodec/NvDecoder
-INCLUDES += -I${NVDIA_SDK_SAMPLES_PATH}/NvCodec/NvEncoder
-INCLUDES += -I${NVDIA_SDK_SAMPLES_PATH}/NvCodec/Common
-INCLUDES += -I${NVDIA_SDK_SAMPLES_PATH}
 INCLUDES += -I${NVDIA_SDK_PATH}/include
+# third_party/Video_Codec_SDK_9.1.23/include
+# INCLUDES += -I${NVDIA_SDK_SAMPLES_PATH}/NvCodec
+# INCLUDES += -I${NVDIA_SDK_SAMPLES_PATH}/NvCodec/include
+# INCLUDES += -I${NVDIA_SDK_SAMPLES_PATH}/NvCodec/NvDecoder
+# INCLUDES += -I${NVDIA_SDK_SAMPLES_PATH}/NvCodec/NvEncoder
+#INCLUDES += -I${NVDIA_SDK_SAMPLES_PATH}/NvCodec/Common
+INCLUDES += -I${NVDIA_SDK_SAMPLES_PATH}
 
 
 NVCCFLAGS := $(CCFLAGS)
@@ -72,7 +74,8 @@ h264_encoder_adaptor.o: h264_encoder_adaptor.cpp
 
 
 test_nv_encoder.o: test_nv_encoder.cpp 
-	$(GCC) $(CCFLAGS)  -o $@ -c $<
+#	$(GCC)  $(CCFLAGS) $(INCLUDES) -E  $<
+	$(GCC)  $(CCFLAGS) $(INCLUDES) -o $@  $<
 
 
 

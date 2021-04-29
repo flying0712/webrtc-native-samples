@@ -9,6 +9,21 @@ set(LIBWEBRTC_BINARY_PATH ${PROJECT_SOURCE_DIR}/third_party/webrtc/lib)
 set(WORK)
 
 
+# set(CMAKE_CXX_STANDARD 17)
+# set(CMAKE_CXX_FLAG -std=c++14 -stdlib=libc++ -lc++ -lc++abi)
+# add_compile_options(-std=c++14)
+# add_compile_options(CMAKE_CXX_FLAG -std=c++14 -stdlib=libc++ -lc++ -lc++abi)
+# add_compile_options(-std=c++14 -stdlib=libc++ -lc++ -lc++abi)
+
+# set(LIBWEBRTC_INCLUDE_PATH "/home/lei/code/prebuilt/m87.4280.10.0/include")
+# set(LIBWEBRTC_BINARY_PATH "/home/lei/code/prebuilt/m87.4280.10.0/lib")
+
+# set(LIBWEBRTC_INCLUDE_PATH "/home/lei/code/webrtc_workspace/my_prebuilt0409/include")
+# set(LIBWEBRTC_BINARY_PATH "/home/lei/code/webrtc_workspace/my_prebuilt0409/lib")
+set(LIBWEBRTC_INCLUDE_PATH "/home/lei/code/webrtc_workspace/my_prebuilt_0412_ok_org/include")
+set(LIBWEBRTC_BINARY_PATH "/home/lei/code/webrtc_workspace/my_prebuilt_0412_ok_org/lib")
+
+
 set(
     SOURCE_FILES_DATACHANNEL
     src/datachannel/main.cpp
@@ -26,6 +41,7 @@ set(
     src/audio-channel/main.cpp
 )
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 
 # datachannel
 add_executable(demo-data "${SOURCE_FILES_DATACHANNEL}")
@@ -39,11 +55,13 @@ target_link_libraries(
     ${LIBWEBRTC_BINARY_PATH}/libwebrtc${CMAKE_STATIC_LIBRARY_SUFFIX}
     pthread
     dl
+    ffmpeg
+    X11
 )
 target_compile_definitions(demo-data PUBLIC
 	$<$<NOT:$<PLATFORM_ID:Windows>>:WEBRTC_POSIX>
 	$<$<PLATFORM_ID:Windows>:WEBRTC_WIN>
-	$<$<PLATFORM_ID:Darwin>:WEBRTC_MAC>
+	$<$<PLATFORM_ID:Darwin>:WEBRTC_MAC> 
 )
 
 #video
@@ -52,12 +70,15 @@ target_include_directories(
     demo-video PUBLIC
     "${LIBWEBRTC_INCLUDE_PATH}"
 	"${LIBWEBRTC_INCLUDE_PATH}/third_party/abseil-cpp"
+	"${LIBWEBRTC_INCLUDE_PATH}/third_party/libyuv/include"
 )
 target_link_libraries(
     demo-video 
     ${LIBWEBRTC_BINARY_PATH}/libwebrtc${CMAKE_STATIC_LIBRARY_SUFFIX}
     pthread
     dl
+    ffmpeg
+    X11
 )
 target_compile_definitions(demo-video PUBLIC
 	$<$<NOT:$<PLATFORM_ID:Windows>>:WEBRTC_POSIX>
@@ -78,6 +99,8 @@ target_link_libraries(
     ${LIBWEBRTC_BINARY_PATH}/libwebrtc${CMAKE_STATIC_LIBRARY_SUFFIX}
     pthread
     dl
+    ffmpeg
+    X11
 )
 
 # Compile definitions for libwebrtc.
@@ -87,7 +110,7 @@ target_compile_definitions(demo-audio PUBLIC
 	$<$<PLATFORM_ID:Darwin>:WEBRTC_MAC>
 )
 
-
+# ADD_DEFINITIONS()
 
 
 

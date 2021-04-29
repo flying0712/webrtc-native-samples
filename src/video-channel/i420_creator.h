@@ -21,6 +21,7 @@ public:
     void run(int fps = 30);
 private:
     I420Frame process();
+    I420Frame my_process();
     int w_ = 0;
     int h_ = 0;
     I420FrameObserver observer_;

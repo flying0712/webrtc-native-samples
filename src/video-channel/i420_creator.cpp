@@ -1,4 +1,9 @@
 #include "i420_creator.h"
+
+#include "libyuv.h"
+#include "libyuv/scale.h"
+#include "rtc_base/logging.h"
+
 #include <cassert>
 #include <future>
 #include <chrono>
@@ -11,28 +16,31 @@ I420Creator::~I420Creator()
     }
 }
 
-void I420Creator::run(int fps)
-{
-    if(running_ || fps == 0) {
-        assert(false);
-        return;
+
+void I420Creator::run(int fps) {
+  if (running_ || fps == 0) {
+    assert(false);
+    return;
+  }
+
+  running_ = true;
+  std::promise<bool> promise;
+  auto future = promise.get_future();
+  thread_ = std::thread([this, fps, &promise]() {
+    promise.set_value(true);
+    int cnt = 0;
+    while (running_ && cnt++ <= 100) {
+      auto duration_ms = 1000 / fps;
+      using namespace std::chrono_literals;
+      std::this_thread::sleep_for(1ms * duration_ms);
+      if (observer_) {
+        observer_(my_process());
+      }
     }
-    running_ = true;
-    std::promise<bool> promise;
-    auto future = promise.get_future();
-    thread_ = std::thread([this, fps, &promise]()
-    {
-        promise.set_value(true);
-        while(running_) {
-            auto duration_ms = 1000 / fps;
-            using namespace std::chrono_literals;
-            std::this_thread::sleep_for(1ms * duration_ms);
-            if(observer_) {
-                observer_(process());
-            }
-        }
-    });
-    future.wait();
+  });
+  pthread_setname_np(thread_.native_handle(), "capture");
+  // thread_.detach();
+  future.wait();
 }
 
 uint8_t limit(int& v, int min, int max)
@@ -57,6 +65,7 @@ void rgb_to_i420(const uint8_t* rgb, uint8_t* yuv, size_t size)
     yuv[1] = limit(u, 0, 255);
     yuv[2] = limit(v, 0, 255);
 }
+
 
 I420Creator::I420Frame I420Creator::process()
 {
@@ -92,4 +101,55 @@ I420Creator::I420Frame I420Creator::process()
         }
     }
     return frame;
+}
+
+I420Creator::I420Frame I420Creator::my_process() {
+  // #if 0
+  // test for argb to i420, scale
+  int width = 1257, height = 688;
+  int src_stride_argb = width * 4;
+
+  // read rgb pix from file to src_argb
+  auto src_argb = std::make_shared<std::vector<uint8_t>>(width * height * 4);
+  assert(src_argb);
+
+  std::string file = "/home/lei/tmp/chunkdata_1257x688.rgba";//ARGB pixel bitmap
+  FILE *f = fopen(file.c_str(), "rb");
+  if (f) {
+    fread(src_argb->data(), 1, width * height * 4, f);
+    fclose(f);
+    RTC_LOG(LS_INFO) << "read from file success";
+  } else {
+    RTC_LOG(LS_INFO) << "open error";
+  }
+
+  int out_w = width + 1;
+  int out_h = height;
+  int out_i420_stride_y = out_w;
+  int out_i420_stride_u = (out_w) / 2;
+  int out_i420_stride_v = (out_w) / 2;
+
+  auto out_i420_frame =
+      std::make_shared<std::vector<uint8_t>>(out_w * out_h * 3 / 2);
+  uint8_t *out_i420_y = out_i420_frame->data();
+  uint8_t *out_i420_u = out_i420_frame->data() + out_w * out_h;
+  uint8_t *out_i420_v = out_i420_frame->data() + out_w * out_h * 5 / 4;
+
+  libyuv::ARGBToI420(src_argb->data(), src_stride_argb, out_i420_y,
+                     out_i420_stride_y, out_i420_u, out_i420_stride_u,
+                     out_i420_v, out_i420_stride_v, width, -height);
+
+  auto scale_i420_frame =
+      std::make_shared<std::vector<uint8_t>>(w_ * h_ * 3 / 2);
+  auto scale_i420_y = scale_i420_frame->data();
+  auto scale_i420_u = scale_i420_frame->data() + w_ * h_;
+  auto scale_i420_v = scale_i420_frame->data() + w_ * h_ * 5 / 4;
+  libyuv::I420Scale(out_i420_y, out_i420_stride_y, out_i420_u,
+                    out_i420_stride_u, out_i420_v, out_i420_stride_v, out_w,
+                    out_h, scale_i420_y, w_, scale_i420_u, w_ / 2, scale_i420_v,
+                    w_ / 2, w_, h_, libyuv::kFilterLinear);
+
+  //#endif
+  return scale_i420_frame;
+
 }
